@@ -14,22 +14,36 @@ Future<void> main() async {
 }
 
 class drilog extends StatefulWidget {
-  const drilog({Key? key}) : super(key: key);
-
   @override
   _drilogState createState() => _drilogState();
 }
 
 class _drilogState extends State<drilog> {
+  final fromController = TextEditingController();
+  final toController = TextEditingController();
+
   late String from;
   late String to;
-  void detailsf() async{
+
+  @override
+  void dispose() {
+    // Always dispose controllers to free up resources
+    fromController.dispose();
+    toController.dispose();
+    super.dispose();
+  }
+
+  // Function to save journey details to Firestore
+  void detailsf() async {
     try {
+      print("Saving journey from ${fromController.text} to ${toController.text}");
       await FirebaseFirestore.instance.collection('journeys').add({
-        'from': from,
-        'to': to,
+        'from': fromController.text,
+        'to': toController.text,
         'timestamp': FieldValue.serverTimestamp(), // Add timestamp for sorting
       });
+      print("Journey saved successfully!");
+
       // Navigate to the next screen after saving the journey
       Navigator.push(
         context,
@@ -37,12 +51,8 @@ class _drilogState extends State<drilog> {
       );
     } catch (e) {
       print('Error saving journey: $e');
-      // Handle error
     }
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -56,89 +66,85 @@ class _drilogState extends State<drilog> {
             fit: BoxFit.cover,
           ),
         ),
-    child: Align(
-      alignment: Alignment.topLeft,
-      child: Padding(
-        padding: const EdgeInsets.all(25.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-
-      SizedBox(height: 30),
-        TextFormField(
-      keyboardType: TextInputType.streetAddress,
-        decoration: InputDecoration(
-       labelText: 'from ',
-       hintText: 'Enter origin',
-       filled: true,
-       fillColor: Color(0xFFffffff),
-       enabledBorder: OutlineInputBorder(
-       borderRadius: const BorderRadius.all(const Radius.circular(30.0)),
-       borderSide: (BorderSide(color: Colors.black))),
-       focusedBorder: OutlineInputBorder(
-       borderRadius: const BorderRadius.all(const Radius.circular(30.0)),
-        borderSide: (BorderSide(color: Colors.black)),
-
-
-    ),
-    ),
-          onChanged: (value) => from = value,
-        ),
-      SizedBox(height: 30,),
-      TextFormField(
-        keyboardType: TextInputType.streetAddress,
-        decoration: InputDecoration(
-          labelText: 'to',
-          hintText: 'Enter destination',
-          filled: true,
-          fillColor: Color(0xFFffffff),
-          enabledBorder: OutlineInputBorder(
-              borderRadius: const BorderRadius.all(const Radius.circular(30.0)),
-              borderSide: (BorderSide(color: Colors.black))),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: const BorderRadius.all(const Radius.circular(30.0)),
-            borderSide: (BorderSide(color: Colors.black)),
+        child: Align(
+          alignment: Alignment.topLeft,
+          child: Padding(
+            padding: const EdgeInsets.all(25.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(height: 30),
+                TextFormField(
+                  controller: fromController,
+                  keyboardType: TextInputType.streetAddress,
+                  decoration: InputDecoration(
+                    labelText: 'from',
+                    hintText: 'Enter origin',
+                    filled: true,
+                    fillColor: Color(0xFFffffff),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                      borderSide: BorderSide(color: Colors.black),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                      borderSide: BorderSide(color: Colors.black),
+                    ),
+                  ),
+                  onChanged: (value) => from = value,
+                ),
+                SizedBox(height: 30),
+                TextFormField(
+                  controller: toController,
+                  keyboardType: TextInputType.streetAddress,
+                  decoration: InputDecoration(
+                    labelText: 'to',
+                    hintText: 'Enter destination',
+                    filled: true,
+                    fillColor: Color(0xFFffffff),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                      borderSide: BorderSide(color: Colors.black),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                      borderSide: BorderSide(color: Colors.black),
+                    ),
+                  ),
+                  onChanged: (value) => to = value,
+                ),
+                SizedBox(height: 30),
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: Color(0xFF0d5393), width: 2.0),
+                    padding: EdgeInsets.all(10.0),
+                    minimumSize: Size(150, 49),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(100.0),
+                    ),
+                  ),
+                  onPressed: () {
+                    if (fromController.text.isNotEmpty && toController.text.isNotEmpty) {
+                      print("Button pressed, navigating to next screen.");
+                      detailsf(); // Save to Firestore and navigate
+                    } else {
+                      print('Please fill in both fields');
+                    }
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "NEXT  ",
+                        style: TextStyle(color: Color(0xFF0d5393)),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-        onChanged: (value) => to = value,
-
-      ),
-      SizedBox(height: 30,),
-      OutlinedButton(
-        style: OutlinedButton.styleFrom(
-          side: BorderSide(color: Color(0xFF0d5393),width: 2.0),
-          padding: EdgeInsets.all (10.0),
-          minimumSize: Size(150,49),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(100.0),
-            // Background color
-          ),
-        ),
-
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
-            return drinext();
-          }));
-        },
-
-        child: Row(
-            mainAxisSize: MainAxisSize.min, // To align the icon and text horizontally
-            children: [
-
-
-        Text(
-          "NEXT  ",
-          style: TextStyle(color: Color(0xFF0d5393)), // Text color
-        ),
-
-
-        ]
-      ),
-      ),
-    ]
-    ),
-      ),
-    ),
       ),
     );
   }

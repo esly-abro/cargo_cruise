@@ -1,6 +1,8 @@
 import 'package:cargo_cruise/homepage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:cargo_cruise/usrhome.dart';
+
 
 void main() {
   runApp(MaterialApp(
@@ -95,8 +97,11 @@ class _usrdstState extends State<usrdst> {
                 ),
               ),
 
-              onPressed: _setText,
-
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+                  return usrhome();
+                }));
+              },
               child: Row(
                 mainAxisSize: MainAxisSize.min, // To align the icon and text horizontally
                 children: [

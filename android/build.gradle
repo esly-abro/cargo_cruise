@@ -6,6 +6,7 @@ buildscript {
 
     dependencies {
         classpath 'com.google.gms:google-services:4.4.2'
+
     }
 }
 
@@ -17,6 +18,12 @@ allprojects {
 }
 
 rootProject.buildDir = '../build'
+
+dependencies {
+    //noinspection UseOfBundledGooglePlayServices
+    implementation 'com.google.android.gms:play-services:12.0.1'
+    implementation 'com.google.android.gms:play-services-ads:23.3.0'
+}
 
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
