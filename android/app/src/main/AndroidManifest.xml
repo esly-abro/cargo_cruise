@@ -1,6 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.cargo_cruise">
 
+    <!-- Add internet permission here -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:label="cargo_cruise"
         android:name="${applicationName}"

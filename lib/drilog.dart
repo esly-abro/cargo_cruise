@@ -7,7 +7,7 @@ import 'drinext.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(); // Initialize Firebase
   runApp(MaterialApp(
     home: drilog(),
   ));
@@ -22,9 +22,6 @@ class _drilogState extends State<drilog> {
   final fromController = TextEditingController();
   final toController = TextEditingController();
 
-  late String from;
-  late String to;
-
   @override
   void dispose() {
     // Always dispose controllers to free up resources
@@ -33,25 +30,20 @@ class _drilogState extends State<drilog> {
     super.dispose();
   }
 
-  // Function to save journey details to Firestore
   void detailsf() async {
-    try {
-      print("Saving journey from ${fromController.text} to ${toController.text}");
-      await FirebaseFirestore.instance.collection('journeys').add({
-        'from': fromController.text,
-        'to': toController.text,
-        'timestamp': FieldValue.serverTimestamp(), // Add timestamp for sorting
-      });
-      print("Journey saved successfully!");
+    String from = fromController.text;
+    String to = toController.text;
 
-      // Navigate to the next screen after saving the journey
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => drinext()),
-      );
-    } catch (e) {
-      print('Error saving journey: $e');
-    }
+    await FirebaseFirestore.instance.collection('journeys').add({
+      'from': from,
+      'to': to,
+    });
+
+    // Navigate to the next screen after saving the journey
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => drinext()),
+    );
   }
 
   @override
@@ -78,7 +70,7 @@ class _drilogState extends State<drilog> {
                   controller: fromController,
                   keyboardType: TextInputType.streetAddress,
                   decoration: InputDecoration(
-                    labelText: 'from',
+                    labelText: 'From',
                     hintText: 'Enter origin',
                     filled: true,
                     fillColor: Color(0xFFffffff),
@@ -91,14 +83,13 @@ class _drilogState extends State<drilog> {
                       borderSide: BorderSide(color: Colors.black),
                     ),
                   ),
-                  onChanged: (value) => from = value,
                 ),
                 SizedBox(height: 30),
                 TextFormField(
                   controller: toController,
                   keyboardType: TextInputType.streetAddress,
                   decoration: InputDecoration(
-                    labelText: 'to',
+                    labelText: 'To',
                     hintText: 'Enter destination',
                     filled: true,
                     fillColor: Color(0xFFffffff),
@@ -111,7 +102,6 @@ class _drilogState extends State<drilog> {
                       borderSide: BorderSide(color: Colors.black),
                     ),
                   ),
-                  onChanged: (value) => to = value,
                 ),
                 SizedBox(height: 30),
                 OutlinedButton(
@@ -125,7 +115,6 @@ class _drilogState extends State<drilog> {
                   ),
                   onPressed: () {
                     if (fromController.text.isNotEmpty && toController.text.isNotEmpty) {
-                      print("Button pressed, navigating to next screen.");
                       detailsf(); // Save to Firestore and navigate
                     } else {
                       print('Please fill in both fields');
